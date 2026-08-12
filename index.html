@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAT English | Liquid Glass</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for sleek typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #0f172a; /* Tailwind slate-900 */
+      margin: 0;
+      overflow: hidden;
+    }
+    
+    /* Liquid Background Animations */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      z-index: 0;
+      animation: float 10s infinite ease-in-out;
+    }
+    .blob-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: rgba(56, 189, 248, 0.4); animation-delay: 0s; }
+    .blob-2 { bottom: -10%; right: -10%; width: 350px; height: 350px; background: rgba(59, 130, 246, 0.5); animation-delay: -3s; }
+    .blob-3 { top: 40%; left: 50%; width: 250px; height: 250px; background: rgba(139, 92, 246, 0.3); animation-delay: -6s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    /* Glassmorphism Utilities */
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    .glass-button {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    .glass-button:hover, .glass-button:active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .glass-button.correct {
+      background: rgba(34, 197, 94, 0.4); /* Green */
+      border-color: rgba(34, 197, 94, 0.8);
+    }
+    .glass-button.incorrect {
+      background: rgba(239, 68, 68, 0.4); /* Red */
+      border-color: rgba(239, 68, 68, 0.8);
+    }
+
+    /* Mobile Container Wrapper */
+    .mobile-container {
+      max-width: 430px; /* iPhone Pro Max width approximation */
+      margin: 0 auto;
+      height: 100vh;
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-col;
+    }
+    
+    /* Hide scrollbar for clean look */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="text-white relative">
+
+  <!-- Animated Liquid Background -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- App Wrapper (Mobile Sized) -->
+  <div class="mobile-container flex flex-col p-5 overflow-y-auto pb-10">
+    
+    <!-- Top Bar -->
+    <header class="flex items-center justify-between py-4 mb-6">
+      <div class="flex items-center gap-2" onclick="goHome()" style="cursor: pointer;">
+        <div class="p-2 rounded-xl glass flex items-center justify-center">
+          <i data-lucide="droplets" class="w-6 h-6 text-blue-400"></i>
+        </div>
+        <h1 class="text-xl font-bold tracking-wider">SAT <span class="text-blue-400 font-light">Flow</span></h1>
+      </div>
+      <div id="score-badge" class="hidden glass px-4 py-1.5 rounded-full text-sm font-semibold text-blue-200">
+        Score: <span id="current-score">0</span>
+      </div>
+    </header>
+
+    <!-- VIEW 1: HOME MENU -->
+    <main id="home-view" class="flex-1 flex flex-col gap-4">
+      <div class="mb-4">
+        <h2 class="text-3xl font-semibold mb-2">Ready to vibe?</h2>
+        <p class="text-blue-200 text-sm opacity-80">Select a section to start practicing.</p>
+      </div>
+
+      <!-- Section 1: Craft & Structure -->
+      <button onclick="startQuiz('craft')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
+        <div class="flex gap-4 items-center">
+          <div class="p-3 rounded-full bg-blue-500/20 text-blue-300 group-hover:bg-blue-500/40">
+            <i data-lucide="book-open"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold">Craft & Structure</h3>
+            <p class="text-xs text-blue-200/60 mt-1">Words in context, text purpose.</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="text-white/50"></i>
+      </button>
+
+      <!-- Section 2: Information & Ideas -->
+      <button onclick="startQuiz('info')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
+        <div class="flex gap-4 items-center">
+          <div class="p-3 rounded-full bg-cyan-500/20 text-cyan-300 group-hover:bg-cyan-500/40">
+            <i data-lucide="lightbulb"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold">Information & Ideas</h3>
+            <p class="text-xs text-blue-200/60 mt-1">Central ideas, command of evidence.</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="text-white/50"></i>
+      </button>
+
+      <!-- Section 3: Standard English -->
+      <button onclick="startQuiz('conventions')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
+        <div class="flex gap-4 items-center">
+          <div class="p-3 rounded-full bg-purple-500/20 text-purple-300 group-hover:bg-purple-500/40">
+            <i data-lucide="check-circle"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold">Standard English</h3>
+            <p class="text-xs text-blue-200/60 mt-1">Grammar, punctuation, verbs.</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="text-white/50"></i>
+      </button>
+
+      <!-- Section 4: Expression of Ideas -->
+      <button onclick="startQuiz('expression')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
+        <div class="flex gap-4 items-center">
+          <div class="p-3 rounded-full bg-pink-500/20 text-pink-300 group-hover:bg-pink-500/40">
+            <i data-lucide="pen-tool"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold">Expression of Ideas</h3>
+            <p class="text-xs text-blue-200/60 mt-1">Transitions, rhetorical synthesis.</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="text-white/50"></i>
+      </button>
+    </main>
+
+    <!-- VIEW 2: QUIZ INTERFACE -->
+    <main id="quiz-view" class="hidden flex-1 flex flex-col relative">
+      <!-- Progress Bar -->
+      <div class="w-full bg-white/10 h-1.5 rounded-full mb-6 mt-2 overflow-hidden">
+        <div id="progress-bar" class="bg-blue-400 h-full rounded-full w-0 transition-all duration-300"></div>
+      </div>
+      
+      <!-- Question Card -->
+      <div class="glass p-6 rounded-2xl mb-6 shadow-2xl">
+        <span id="q-category" class="text-[10px] uppercase tracking-widest text-blue-300 font-bold mb-3 block">Section</span>
+        <p id="q-text" class="text-sm md:text-base leading-relaxed font-light"></p>
+        <p id="q-prompt" class="mt-4 font-semibold text-sm"></p>
+      </div>
+
+      <!-- Options -->
+      <div id="options-container" class="flex flex-col gap-3 mb-6 flex-1">
+        <!-- Buttons injected by JS -->
+      </div>
+
+      <!-- Explanation Box -->
+      <div id="explanation-box" class="hidden glass p-5 rounded-2xl mb-6 border-l-4 border-l-blue-400">
+        <h4 class="font-bold text-sm mb-1" id="exp-title">Explanation</h4>
+        <p class="text-xs text-white/80 leading-relaxed" id="exp-text"></p>
+      </div>
+
+      <!-- Next Button -->
+      <button id="next-btn" onclick="nextQuestion()" class="hidden w-full bg-blue-500 text-white font-semibold py-4 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:bg-blue-600 transition active:scale-95">
+        Next Question
+      </button>
+    </main>
+
+    <!-- VIEW 3: RESULTS -->
+    <main id="result-view" class="hidden flex-1 flex flex-col items-center justify-center text-center">
+      <div class="glass p-10 rounded-3xl flex flex-col items-center max-w-sm w-full">
+        <div class="w-20 h-20 rounded-full bg-blue-500/20 flex items-center justify-center mb-6 border border-blue-400/50">
+          <i data-lucide="award" class="w-10 h-10 text-blue-400"></i>
+        </div>
+        <h2 class="text-3xl font-bold mb-2">Vibe Check Complete</h2>
+        <p class="text-blue-200 mb-8">You scored <span id="final-score" class="font-bold text-white text-xl"></span> out of <span id="total-q"></span></p>
+        
+        <button onclick="goHome()" class="w-full bg-white text-blue-900 font-bold py-4 rounded-xl hover:bg-gray-100 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+          Back to Menu
+        </button>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // Initialize Icons
+    lucide.createIcons();
+
+    // The Synthetic SAT Question Bank (JSON Database)
+    const questionBank = {
+      craft: [
+        {
+          text: "While investigating the effects of extreme pressure on carbon structures, the research team discovered that the newly synthesized material was remarkably ______; it resisted scratching by diamonds, the hardest known natural substance.",
+          prompt: "Which choice completes the text with the most logical and precise word or phrase?",
+          options: ["brittle", "resilient", "porous", "malleable"],
+          answer: 1,
+          explanation: "The text says the material 'resisted scratching by diamonds'. 'Resilient' (or durable/tough) fits best. Brittle means easy to break, porous means full of holes, and malleable means easily shaped."
+        }
+      ],
+      info: [
+        {
+          text: "Many historians attribute the rapid spread of the printing press in the 15th century to the dropping cost of paper. However, economist John Smith argues that the standardization of local dialects was the true catalyst, as it guaranteed a massive, unified market of readers for printers to sell to.",
+          prompt: "Which statement best describes the main idea of the text?",
+          options: [
+            "Historians and economists agree that paper costs drove the printing revolution.",
+            "Smith believes language standardization, not cheap paper, primarily drove the success of the printing press.",
+            "The printing press caused local dialects to become standardized.",
+            "The rapid spread of the printing press forced the price of paper to drop."
+          ],
+          answer: 1,
+          explanation: "The text contrasts the view of 'many historians' (cheap paper) with Smith's argument (standardized dialects guaranteed a market). Option B perfectly captures Smith's specific argument."
+        }
+      ],
+      conventions: [
+        {
+          text: "The giant Pacific octopus is incredibly intelligent. Researchers have observed the creatures navigating mazes, unscrewing jars to retrieve food, and ______ out of their tanks to explore the laboratory floor.",
+          prompt: "Which choice completes the text so that it conforms to the conventions of Standard English?",
+          options: ["to sneak", "sneaking", "sneaks", "snuck"],
+          answer: 1,
+          explanation: "The sentence uses a parallel list of gerunds: 'navigating', 'unscrewing', and therefore needs 'sneaking' to maintain parallel structure."
+        }
+      ],
+      expression: [
+        {
+          text: "Electric vehicles (EVs) produce zero tailpipe emissions, making them highly attractive for cities battling severe air pollution. ______, the batteries that power these vehicles require lithium mining, an extractive process that can cause significant environmental degradation in rural areas.",
+          prompt: "Which choice completes the text with the most logical transition?",
+          options: ["Consequently", "For example", "Nevertheless", "Similarly"],
+          answer: 2,
+          explanation: "The first sentence highlights a positive environmental aspect of EVs. The second sentence highlights a negative environmental aspect. 'Nevertheless' signals this contrast effectively."
+        }
+      ]
+    };
+
+    // App State
+    let currentCategory = '';
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    // DOM Elements
+    const views = {
+      home: document.getElementById('home-view'),
+      quiz: document.getElementById('quiz-view'),
+      result: document.getElementById('result-view')
+    };
+    
+    function showView(viewName) {
+      Object.values(views).forEach(v => v.classList.add('hidden'));
+      views[viewName].classList.remove('hidden');
+    }
+
+    function goHome() {
+      showView('home');
+      document.getElementById('score-badge').classList.add('hidden');
+    }
+
+    function startQuiz(category) {
+      currentCategory = category;
+      currentQuestions = questionBank[category];
+      currentIndex = 0;
+      score = 0;
+      
+      document.getElementById('current-score').innerText = score;
+      document.getElementById('score-badge').classList.remove('hidden');
+      
+      showView('quiz');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = currentQuestions[currentIndex];
+      
+      // Update UI texts
+      document.getElementById('q-category').innerText = currentCategory.replace(/([A-Z])/g, ' $1').trim();
+      document.getElementById('q-text').innerText = q.text;
+      document.getElementById('q-prompt').innerText = q.prompt;
+      
+      // Reset explanation & button
+      document.getElementById('explanation-box').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+      
+      // Update Progress
+      const progress = ((currentIndex) / currentQuestions.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+
+      // Render Options
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'glass-button w-full p-4 rounded-xl text-left text-sm font-medium relative overflow-hidden group';
+        btn.innerHTML = `
+          <span class="inline-block bg-white/10 text-white/50 rounded mr-3 px-2 py-1 text-xs group-hover:bg-white/20 transition">${String.fromCharCode(65 + index)}</span>
+          ${opt}
+        `;
+        btn.onclick = () => selectAnswer(index, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(selectedIndex, btnElement) {
+      const q = currentQuestions[currentIndex];
+      const buttons = document.getElementById('options-container').children;
+      
+      // Disable all buttons
+      for (let btn of buttons) {
+        btn.onclick = null; 
+        btn.style.opacity = '0.7';
+      }
+      
+      const isCorrect = (selectedIndex === q.answer);
+      
+      if (isCorrect) {
+        btnElement.classList.add('correct');
+        score++;
+        document.getElementById('current-score').innerText = score;
+        document.getElementById('exp-title').innerText = "Correct! 🎯";
+        document.getElementById('exp-title').classList.replace('text-red-400', 'text-green-400') || document.getElementById('exp-title').classList.add('text-green-400');
+      } else {
+        btnElement.classList.add('incorrect');
+        // Highlight correct one
+        buttons[q.answer].classList.add('correct');
+        document.getElementById('exp-title').innerText = "Not Quite ❌";
+        document.getElementById('exp-title').classList.replace('text-green-400', 'text-red-400') || document.getElementById('exp-title').classList.add('text-red-400');
+      }
+
+      // Show explanation
+      const expBox = document.getElementById('explanation-box');
+      document.getElementById('exp-text').innerText = q.explanation;
+      expBox.classList.remove('hidden');
+      
+      // Show Next button
+      document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex < currentQuestions.length) {
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('progress-bar').style.width = `100%`;
+      setTimeout(() => {
+        showView('result');
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('total-q').innerText = currentQuestions.length;
+        document.getElementById('score-badge').classList.add('hidden');
+      }, 300);
+    }
+  </script>
+</body>
+</html>
