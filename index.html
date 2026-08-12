@@ -3,232 +3,795 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAT English | Liquid Glass</title>
-  <!-- Tailwind CSS via CDN -->
+  <meta name="theme-color" content="#E0E5EC">
+  <title>SAT Flow | Digital SAT Practice</title>
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts for sleek typography -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- Lucide Icons -->
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
+
   <style>
+    :root {
+      --surface: #E0E5EC;
+      --foreground: #3D4852;
+      --muted: #6B7280;
+      --accent: #6C63FF;
+      --accent-light: #8B84FF;
+      --success: #38B2AC;
+
+      --shadow-dark: rgba(163, 177, 198, 0.65);
+      --shadow-light: rgba(255, 255, 255, 0.6);
+
+      --radius-card: 32px;
+      --radius-control: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Outfit', sans-serif;
-      background-color: #0f172a; /* Tailwind slate-900 */
       margin: 0;
+      min-height: 100vh;
+      background: var(--surface);
+      color: var(--foreground);
+      font-family: 'DM Sans', sans-serif;
       overflow: hidden;
     }
-    
-    /* Liquid Background Animations */
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      z-index: 0;
-      animation: float 10s infinite ease-in-out;
-    }
-    .blob-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: rgba(56, 189, 248, 0.4); animation-delay: 0s; }
-    .blob-2 { bottom: -10%; right: -10%; width: 350px; height: 350px; background: rgba(59, 130, 246, 0.5); animation-delay: -3s; }
-    .blob-3 { top: 40%; left: 50%; width: 250px; height: 250px; background: rgba(139, 92, 246, 0.3); animation-delay: -6s; }
 
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -50px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
+    button {
+      font-family: inherit;
     }
 
-    /* Glassmorphism Utilities */
-    .glass {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    .glass-button {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
+
+    /* =========================================================
+       NEUMORPHIC PHYSICS
+    ========================================================= */
+
+    .neu {
+      background: var(--surface);
+      box-shadow:
+        9px 9px 16px var(--shadow-dark),
+        -9px -9px 16px var(--shadow-light);
     }
-    .glass-button:hover, .glass-button:active {
-      background: rgba(255, 255, 255, 0.2);
+
+    .neu-hover {
+      transition:
+        transform 300ms ease-out,
+        box-shadow 300ms ease-out;
+    }
+
+    .neu-hover:hover {
       transform: translateY(-2px);
-    }
-    .glass-button.correct {
-      background: rgba(34, 197, 94, 0.4); /* Green */
-      border-color: rgba(34, 197, 94, 0.8);
-    }
-    .glass-button.incorrect {
-      background: rgba(239, 68, 68, 0.4); /* Red */
-      border-color: rgba(239, 68, 68, 0.8);
+      box-shadow:
+        12px 12px 20px rgba(163, 177, 198, 0.7),
+        -12px -12px 20px rgba(255, 255, 255, 0.65);
     }
 
-    /* Mobile Container Wrapper */
-    .mobile-container {
-      max-width: 430px; /* iPhone Pro Max width approximation */
-      margin: 0 auto;
-      height: 100vh;
-      position: relative;
-      z-index: 10;
-      display: flex;
-      flex-col;
+    .neu-hover:active {
+      transform: translateY(0.5px);
+      box-shadow:
+        inset 3px 3px 6px rgba(163, 177, 198, 0.6),
+        inset -3px -3px 6px rgba(255, 255, 255, 0.5);
     }
-    
-    /* Hide scrollbar for clean look */
-    ::-webkit-scrollbar { display: none; }
+
+    .neu-small {
+      background: var(--surface);
+      box-shadow:
+        5px 5px 10px rgba(163, 177, 198, 0.6),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .neu-inset {
+      background: var(--surface);
+      box-shadow:
+        inset 6px 6px 10px rgba(163, 177, 198, 0.6),
+        inset -6px -6px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .neu-deep {
+      background: var(--surface);
+      box-shadow:
+        inset 10px 10px 20px rgba(163, 177, 198, 0.7),
+        inset -10px -10px 20px rgba(255, 255, 255, 0.6);
+    }
+
+    .neu-inset-small {
+      background: var(--surface);
+      box-shadow:
+        inset 3px 3px 6px rgba(163, 177, 198, 0.6),
+        inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+    }
+
+    /* =========================================================
+       ACCESSIBILITY
+    ========================================================= */
+
+    button:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 2px var(--surface),
+        0 0 0 4px var(--accent),
+        9px 9px 16px var(--shadow-dark),
+        -9px -9px 16px var(--shadow-light);
+    }
+
+    /* =========================================================
+       MOBILE APP CONTAINER
+    ========================================================= */
+
+    .mobile-container {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* =========================================================
+       SUBTLE AMBIENT DECORATION
+    ========================================================= */
+
+    .ambient-circle {
+      position: fixed;
+      pointer-events: none;
+      border-radius: 9999px;
+      opacity: 0.45;
+      z-index: -1;
+    }
+
+    .ambient-circle.one {
+      width: 180px;
+      height: 180px;
+      top: -90px;
+      left: -70px;
+      box-shadow:
+        inset 12px 12px 24px rgba(163, 177, 198, 0.25),
+        inset -12px -12px 24px rgba(255, 255, 255, 0.35);
+    }
+
+    .ambient-circle.two {
+      width: 220px;
+      height: 220px;
+      right: -120px;
+      bottom: -100px;
+      box-shadow:
+        inset 12px 12px 24px rgba(163, 177, 198, 0.25),
+        inset -12px -12px 24px rgba(255, 255, 255, 0.35);
+    }
+
+    /* =========================================================
+       ICON WELLS
+    ========================================================= */
+
+    .icon-well {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      box-shadow:
+        inset 6px 6px 10px rgba(163, 177, 198, 0.6),
+        inset -6px -6px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .brand-icon {
+      color: var(--accent);
+    }
+
+    /* =========================================================
+       CATEGORY CARDS
+    ========================================================= */
+
+    .category-card {
+      background: var(--surface);
+      border: none;
+      box-shadow:
+        9px 9px 16px rgba(163, 177, 198, 0.65),
+        -9px -9px 16px rgba(255, 255, 255, 0.6);
+
+      transition:
+        transform 300ms ease-out,
+        box-shadow 300ms ease-out;
+    }
+
+    .category-card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        12px 12px 20px rgba(163, 177, 198, 0.7),
+        -12px -12px 20px rgba(255, 255, 255, 0.65);
+    }
+
+    .category-card:active {
+      transform: translateY(0.5px);
+      box-shadow:
+        inset 3px 3px 6px rgba(163, 177, 198, 0.6),
+        inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+    }
+
+    /* =========================================================
+       ANSWER BUTTONS
+    ========================================================= */
+
+    .answer-button {
+      min-height: 58px;
+      background: var(--surface);
+      color: var(--foreground);
+
+      box-shadow:
+        6px 6px 12px rgba(163, 177, 198, 0.6),
+        -6px -6px 12px rgba(255, 255, 255, 0.5);
+
+      transition:
+        transform 250ms ease-out,
+        box-shadow 250ms ease-out;
+    }
+
+    .answer-button:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        8px 8px 15px rgba(163, 177, 198, 0.65),
+        -8px -8px 15px rgba(255, 255, 255, 0.55);
+    }
+
+    .answer-button:active {
+      transform: translateY(1px);
+      box-shadow:
+        inset 5px 5px 9px rgba(163, 177, 198, 0.6),
+        inset -5px -5px 9px rgba(255, 255, 255, 0.5);
+    }
+
+    .answer-letter {
+      background: var(--surface);
+      box-shadow:
+        inset 3px 3px 6px rgba(163, 177, 198, 0.55),
+        inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+      color: var(--muted);
+    }
+
+    .answer-button.correct {
+      color: #247f79;
+      box-shadow:
+        inset 5px 5px 9px rgba(163, 177, 198, 0.45),
+        inset -5px -5px 9px rgba(255, 255, 255, 0.5),
+        0 0 0 2px rgba(56, 178, 172, 0.25);
+    }
+
+    .answer-button.incorrect {
+      color: #a94a4a;
+      box-shadow:
+        inset 5px 5px 9px rgba(163, 177, 198, 0.45),
+        inset -5px -5px 9px rgba(255, 255, 255, 0.5),
+        0 0 0 2px rgba(190, 80, 80, 0.2);
+    }
+
+    /* =========================================================
+       PRIMARY BUTTON
+    ========================================================= */
+
+    .primary-button {
+      background: var(--accent);
+      color: white;
+      border: none;
+
+      box-shadow:
+        7px 7px 14px rgba(163, 177, 198, 0.65),
+        -7px -7px 14px rgba(255, 255, 255, 0.55);
+
+      transition:
+        transform 300ms ease-out,
+        box-shadow 300ms ease-out;
+    }
+
+    .primary-button:hover {
+      transform: translateY(-2px);
+      background: var(--accent-light);
+      box-shadow:
+        10px 10px 18px rgba(163, 177, 198, 0.7),
+        -10px -10px 18px rgba(255, 255, 255, 0.6);
+    }
+
+    .primary-button:active {
+      transform: translateY(0.5px);
+      box-shadow:
+        inset 5px 5px 10px rgba(65, 59, 170, 0.4),
+        inset -5px -5px 10px rgba(255, 255, 255, 0.25);
+    }
+
+    /* =========================================================
+       PROGRESS
+    ========================================================= */
+
+    .progress-track {
+      height: 10px;
+      border-radius: 9999px;
+
+      box-shadow:
+        inset 3px 3px 6px rgba(163, 177, 198, 0.6),
+        inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      background: var(--accent);
+      box-shadow:
+        2px 2px 5px rgba(163, 177, 198, 0.35),
+        -2px -2px 5px rgba(255, 255, 255, 0.25);
+
+      transition: width 300ms ease-out;
+    }
+
+    /* =========================================================
+       QUESTION CARD
+    ========================================================= */
+
+    .question-card {
+      background: var(--surface);
+      box-shadow:
+        11px 11px 20px rgba(163, 177, 198, 0.65),
+        -11px -11px 20px rgba(255, 255, 255, 0.6);
+    }
+
+    /* =========================================================
+       EXPLANATION
+    ========================================================= */
+
+    .explanation-box {
+      background: var(--surface);
+      box-shadow:
+        inset 5px 5px 10px rgba(163, 177, 198, 0.55),
+        inset -5px -5px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    /* =========================================================
+       VIEW ANIMATION
+    ========================================================= */
+
+    .view-enter {
+      animation: viewEnter 350ms ease-out;
+    }
+
+    @keyframes viewEnter {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .answer-enter {
+      animation: answerEnter 300ms ease-out both;
+    }
+
+    @keyframes answerEnter {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =========================================================
+       SCROLLBAR
+    ========================================================= */
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* =========================================================
+       REDUCED MOTION
+    ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
-<body class="text-white relative">
 
-  <!-- Animated Liquid Background -->
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
+<body>
 
-  <!-- App Wrapper (Mobile Sized) -->
+  <!-- Subtle neumorphic ambient decoration -->
+  <div class="ambient-circle one"></div>
+  <div class="ambient-circle two"></div>
+
+  <!-- Mobile App -->
   <div class="mobile-container flex flex-col p-5 overflow-y-auto pb-10">
-    
-    <!-- Top Bar -->
+
+    <!-- =======================================================
+         HEADER
+    ======================================================== -->
+
     <header class="flex items-center justify-between py-4 mb-6">
-      <div class="flex items-center gap-2" onclick="goHome()" style="cursor: pointer;">
-        <div class="p-2 rounded-xl glass flex items-center justify-center">
-          <i data-lucide="droplets" class="w-6 h-6 text-blue-400"></i>
+
+      <button
+        onclick="goHome()"
+        aria-label="Return to home"
+        class="flex items-center gap-3 bg-transparent border-0 p-0 rounded-2xl focus:outline-none"
+      >
+        <div class="icon-well w-11 h-11 rounded-2xl">
+          <i data-lucide="droplets" class="w-5 h-5 brand-icon"></i>
         </div>
-        <h1 class="text-xl font-bold tracking-wider">SAT <span class="text-blue-400 font-light">Flow</span></h1>
+
+        <h1 class="font-display text-xl font-extrabold tracking-tight">
+          SAT
+          <span class="font-medium text-[#6C63FF]">Flow</span>
+        </h1>
+      </button>
+
+      <div
+        id="score-badge"
+        class="hidden neu-small px-4 py-2 rounded-full text-sm font-bold text-[#3D4852]"
+      >
+        Score:
+        <span id="current-score" class="text-[#6C63FF]">0</span>
       </div>
-      <div id="score-badge" class="hidden glass px-4 py-1.5 rounded-full text-sm font-semibold text-blue-200">
-        Score: <span id="current-score">0</span>
-      </div>
+
     </header>
 
-    <!-- VIEW 1: HOME MENU -->
-    <main id="home-view" class="flex-1 flex flex-col gap-4">
-      <div class="mb-4">
-        <h2 class="text-3xl font-semibold mb-2">Ready to vibe?</h2>
-        <p class="text-blue-200 text-sm opacity-80">Select a section to start practicing.</p>
+    <!-- =======================================================
+         HOME
+    ======================================================== -->
+
+    <main id="home-view" class="flex-1 flex flex-col gap-5 view-enter">
+
+      <div class="mb-3 px-1">
+        <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#6C63FF] mb-2">
+          SAT English
+        </p>
+
+        <h2 class="font-display text-3xl font-extrabold tracking-tight mb-2">
+          Ready to practice?
+        </h2>
+
+        <p class="text-sm text-[#6B7280] leading-relaxed">
+          Choose a skill and sharpen your English one question at a time.
+        </p>
       </div>
 
-      <!-- Section 1: Craft & Structure -->
-      <button onclick="startQuiz('craft')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
-        <div class="flex gap-4 items-center">
-          <div class="p-3 rounded-full bg-blue-500/20 text-blue-300 group-hover:bg-blue-500/40">
-            <i data-lucide="book-open"></i>
+      <!-- Craft -->
+      <button
+        onclick="startQuiz('craft')"
+        class="category-card w-full rounded-[32px] p-5 text-left flex items-center justify-between group"
+      >
+        <div class="flex gap-4 items-center min-w-0">
+
+          <div class="icon-well w-14 h-14 shrink-0 rounded-2xl text-[#6C63FF]">
+            <i data-lucide="book-open" class="w-6 h-6"></i>
           </div>
-          <div>
-            <h3 class="text-lg font-semibold">Craft & Structure</h3>
-            <p class="text-xs text-blue-200/60 mt-1">Words in context, text purpose.</p>
+
+          <div class="min-w-0">
+            <h3 class="font-display text-base font-bold tracking-tight">
+              Craft & Structure
+            </h3>
+
+            <p class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+              Words in context, text purpose.
+            </p>
           </div>
+
         </div>
-        <i data-lucide="chevron-right" class="text-white/50"></i>
+
+        <div class="icon-well w-9 h-9 rounded-xl shrink-0 ml-3">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-[#6B7280]"></i>
+        </div>
       </button>
 
-      <!-- Section 2: Information & Ideas -->
-      <button onclick="startQuiz('info')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
-        <div class="flex gap-4 items-center">
-          <div class="p-3 rounded-full bg-cyan-500/20 text-cyan-300 group-hover:bg-cyan-500/40">
-            <i data-lucide="lightbulb"></i>
+      <!-- Information -->
+      <button
+        onclick="startQuiz('info')"
+        class="category-card w-full rounded-[32px] p-5 text-left flex items-center justify-between group"
+      >
+        <div class="flex gap-4 items-center min-w-0">
+
+          <div class="icon-well w-14 h-14 shrink-0 rounded-2xl text-[#6C63FF]">
+            <i data-lucide="lightbulb" class="w-6 h-6"></i>
           </div>
-          <div>
-            <h3 class="text-lg font-semibold">Information & Ideas</h3>
-            <p class="text-xs text-blue-200/60 mt-1">Central ideas, command of evidence.</p>
+
+          <div class="min-w-0">
+            <h3 class="font-display text-base font-bold tracking-tight">
+              Information & Ideas
+            </h3>
+
+            <p class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+              Central ideas, command of evidence.
+            </p>
           </div>
+
         </div>
-        <i data-lucide="chevron-right" class="text-white/50"></i>
+
+        <div class="icon-well w-9 h-9 rounded-xl shrink-0 ml-3">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-[#6B7280]"></i>
+        </div>
       </button>
 
-      <!-- Section 3: Standard English -->
-      <button onclick="startQuiz('conventions')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
-        <div class="flex gap-4 items-center">
-          <div class="p-3 rounded-full bg-purple-500/20 text-purple-300 group-hover:bg-purple-500/40">
-            <i data-lucide="check-circle"></i>
+      <!-- Standard English -->
+      <button
+        onclick="startQuiz('conventions')"
+        class="category-card w-full rounded-[32px] p-5 text-left flex items-center justify-between group"
+      >
+        <div class="flex gap-4 items-center min-w-0">
+
+          <div class="icon-well w-14 h-14 shrink-0 rounded-2xl text-[#6C63FF]">
+            <i data-lucide="check-circle" class="w-6 h-6"></i>
           </div>
-          <div>
-            <h3 class="text-lg font-semibold">Standard English</h3>
-            <p class="text-xs text-blue-200/60 mt-1">Grammar, punctuation, verbs.</p>
+
+          <div class="min-w-0">
+            <h3 class="font-display text-base font-bold tracking-tight">
+              Standard English
+            </h3>
+
+            <p class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+              Grammar, punctuation, verbs.
+            </p>
           </div>
+
         </div>
-        <i data-lucide="chevron-right" class="text-white/50"></i>
+
+        <div class="icon-well w-9 h-9 rounded-xl shrink-0 ml-3">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-[#6B7280]"></i>
+        </div>
       </button>
 
-      <!-- Section 4: Expression of Ideas -->
-      <button onclick="startQuiz('expression')" class="glass rounded-2xl p-5 text-left flex items-center justify-between group hover:bg-white/10 transition">
-        <div class="flex gap-4 items-center">
-          <div class="p-3 rounded-full bg-pink-500/20 text-pink-300 group-hover:bg-pink-500/40">
-            <i data-lucide="pen-tool"></i>
+      <!-- Expression -->
+      <button
+        onclick="startQuiz('expression')"
+        class="category-card w-full rounded-[32px] p-5 text-left flex items-center justify-between group"
+      >
+        <div class="flex gap-4 items-center min-w-0">
+
+          <div class="icon-well w-14 h-14 shrink-0 rounded-2xl text-[#6C63FF]">
+            <i data-lucide="pen-tool" class="w-6 h-6"></i>
           </div>
-          <div>
-            <h3 class="text-lg font-semibold">Expression of Ideas</h3>
-            <p class="text-xs text-blue-200/60 mt-1">Transitions, rhetorical synthesis.</p>
+
+          <div class="min-w-0">
+            <h3 class="font-display text-base font-bold tracking-tight">
+              Expression of Ideas
+            </h3>
+
+            <p class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+              Transitions, rhetorical synthesis.
+            </p>
           </div>
+
         </div>
-        <i data-lucide="chevron-right" class="text-white/50"></i>
+
+        <div class="icon-well w-9 h-9 rounded-xl shrink-0 ml-3">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-[#6B7280]"></i>
+        </div>
       </button>
+
     </main>
 
-    <!-- VIEW 2: QUIZ INTERFACE -->
-    <main id="quiz-view" class="hidden flex-1 flex flex-col relative">
-      <!-- Progress Bar -->
-      <div class="w-full bg-white/10 h-1.5 rounded-full mb-6 mt-2 overflow-hidden">
-        <div id="progress-bar" class="bg-blue-400 h-full rounded-full w-0 transition-all duration-300"></div>
+    <!-- =======================================================
+         QUIZ
+    ======================================================== -->
+
+    <main id="quiz-view" class="hidden flex-1 flex flex-col relative view-enter">
+
+      <!-- Quiz top row -->
+      <div class="flex items-center justify-between mb-3">
+
+        <button
+          onclick="goHome()"
+          class="flex items-center gap-1.5 text-xs font-bold text-[#6B7280] hover:text-[#3D4852] transition-colors rounded-xl px-2 py-2"
+        >
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          Exit
+        </button>
+
+        <span
+          id="question-counter"
+          class="text-xs font-bold text-[#6B7280]"
+        >
+          Question 1 of 1
+        </span>
+
       </div>
-      
+
+      <!-- Progress -->
+      <div class="progress-track w-full mb-6">
+        <div
+          id="progress-bar"
+          class="progress-fill w-0"
+        ></div>
+      </div>
+
       <!-- Question Card -->
-      <div class="glass p-6 rounded-2xl mb-6 shadow-2xl">
-        <span id="q-category" class="text-[10px] uppercase tracking-widest text-blue-300 font-bold mb-3 block">Section</span>
-        <p id="q-text" class="text-sm md:text-base leading-relaxed font-light"></p>
-        <p id="q-prompt" class="mt-4 font-semibold text-sm"></p>
+      <div class="question-card p-6 rounded-[32px] mb-6">
+
+        <span
+          id="q-category"
+          class="text-[10px] uppercase tracking-[0.18em] text-[#6C63FF] font-bold mb-4 block"
+        >
+          Section
+        </span>
+
+        <p
+          id="q-text"
+          class="text-[15px] leading-7 font-medium text-[#3D4852]"
+        ></p>
+
+        <p
+          id="q-prompt"
+          class="mt-5 pt-5 border-t border-[#cbd3dc] font-bold text-sm leading-6 text-[#3D4852]"
+        ></p>
+
       </div>
 
       <!-- Options -->
-      <div id="options-container" class="flex flex-col gap-3 mb-6 flex-1">
-        <!-- Buttons injected by JS -->
+      <div
+        id="options-container"
+        class="flex flex-col gap-4 mb-6 flex-1"
+      ></div>
+
+      <!-- Explanation -->
+      <div
+        id="explanation-box"
+        class="hidden explanation-box p-5 rounded-[24px] mb-6"
+      >
+
+        <div class="flex items-center gap-2 mb-2">
+
+          <div
+            class="icon-well w-8 h-8 rounded-xl"
+          >
+            <i
+              data-lucide="info"
+              class="w-4 h-4 text-[#6C63FF]"
+            ></i>
+          </div>
+
+          <h4
+            class="font-display font-bold text-sm"
+            id="exp-title"
+          >
+            Explanation
+          </h4>
+
+        </div>
+
+        <p
+          class="text-xs text-[#6B7280] leading-relaxed"
+          id="exp-text"
+        ></p>
+
       </div>
 
-      <!-- Explanation Box -->
-      <div id="explanation-box" class="hidden glass p-5 rounded-2xl mb-6 border-l-4 border-l-blue-400">
-        <h4 class="font-bold text-sm mb-1" id="exp-title">Explanation</h4>
-        <p class="text-xs text-white/80 leading-relaxed" id="exp-text"></p>
-      </div>
-
-      <!-- Next Button -->
-      <button id="next-btn" onclick="nextQuestion()" class="hidden w-full bg-blue-500 text-white font-semibold py-4 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:bg-blue-600 transition active:scale-95">
+      <!-- Next -->
+      <button
+        id="next-btn"
+        onclick="nextQuestion()"
+        class="hidden primary-button w-full min-h-[52px] rounded-2xl font-bold text-sm"
+      >
         Next Question
+        <i data-lucide="arrow-right" class="inline-block w-4 h-4 ml-1"></i>
       </button>
+
     </main>
 
-    <!-- VIEW 3: RESULTS -->
-    <main id="result-view" class="hidden flex-1 flex flex-col items-center justify-center text-center">
-      <div class="glass p-10 rounded-3xl flex flex-col items-center max-w-sm w-full">
-        <div class="w-20 h-20 rounded-full bg-blue-500/20 flex items-center justify-center mb-6 border border-blue-400/50">
-          <i data-lucide="award" class="w-10 h-10 text-blue-400"></i>
+    <!-- =======================================================
+         RESULTS
+    ======================================================== -->
+
+    <main
+      id="result-view"
+      class="hidden flex-1 flex flex-col items-center justify-center text-center view-enter"
+    >
+
+      <div class="neu p-8 rounded-[32px] flex flex-col items-center w-full max-w-sm">
+
+        <!-- Trophy well -->
+        <div
+          class="icon-well w-20 h-20 rounded-full flex items-center justify-center mb-6"
+        >
+          <i
+            data-lucide="award"
+            class="w-9 h-9 text-[#6C63FF]"
+          ></i>
         </div>
-        <h2 class="text-3xl font-bold mb-2">Vibe Check Complete</h2>
-        <p class="text-blue-200 mb-8">You scored <span id="final-score" class="font-bold text-white text-xl"></span> out of <span id="total-q"></span></p>
-        
-        <button onclick="goHome()" class="w-full bg-white text-blue-900 font-bold py-4 rounded-xl hover:bg-gray-100 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-          Back to Menu
+
+        <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#6C63FF] mb-2">
+          Session complete
+        </p>
+
+        <h2 class="font-display text-2xl font-extrabold tracking-tight mb-6">
+          Nice work.
+        </h2>
+
+        <div
+          class="neu-deep rounded-[28px] px-10 py-6 mb-6"
+        >
+          <div
+            id="final-score"
+            class="font-display text-5xl font-extrabold tracking-tight text-[#6C63FF]"
+          >
+            0
+          </div>
+
+          <div class="text-sm font-medium text-[#6B7280] mt-1">
+            out of
+            <span id="total-q">0</span>
+          </div>
+        </div>
+
+        <p class="text-sm text-[#6B7280] leading-relaxed mb-8">
+          Keep practicing and build your accuracy one session at a time.
+        </p>
+
+        <button
+          onclick="goHome()"
+          class="primary-button w-full min-h-[52px] rounded-2xl font-bold text-sm"
+        >
+          Back to Practice
         </button>
+
       </div>
+
     </main>
 
   </div>
 
   <script>
-    // Initialize Icons
+
+    /* =========================================================
+       ICONS
+    ========================================================= */
+
     lucide.createIcons();
 
-    // The Synthetic SAT Question Bank (JSON Database)
+
+    /* =========================================================
+       QUESTION BANK
+    ========================================================= */
+
     const questionBank = {
+
       craft: [
         {
           text: "While investigating the effects of extreme pressure on carbon structures, the research team discovered that the newly synthesized material was remarkably ______; it resisted scratching by diamonds, the hardest known natural substance.",
           prompt: "Which choice completes the text with the most logical and precise word or phrase?",
-          options: ["brittle", "resilient", "porous", "malleable"],
+          options: [
+            "brittle",
+            "resilient",
+            "porous",
+            "malleable"
+          ],
           answer: 1,
-          explanation: "The text says the material 'resisted scratching by diamonds'. 'Resilient' (or durable/tough) fits best. Brittle means easy to break, porous means full of holes, and malleable means easily shaped."
+          explanation: "The material resists scratching by diamonds, indicating that it is highly durable. 'Resilient' is therefore the best choice."
         }
       ],
+
       info: [
         {
           text: "Many historians attribute the rapid spread of the printing press in the 15th century to the dropping cost of paper. However, economist John Smith argues that the standardization of local dialects was the true catalyst, as it guaranteed a massive, unified market of readers for printers to sell to.",
@@ -240,150 +803,305 @@
             "The rapid spread of the printing press forced the price of paper to drop."
           ],
           answer: 1,
-          explanation: "The text contrasts the view of 'many historians' (cheap paper) with Smith's argument (standardized dialects guaranteed a market). Option B perfectly captures Smith's specific argument."
+          explanation: "The text contrasts the view of many historians with Smith's argument that language standardization created a larger unified market."
         }
       ],
+
       conventions: [
         {
           text: "The giant Pacific octopus is incredibly intelligent. Researchers have observed the creatures navigating mazes, unscrewing jars to retrieve food, and ______ out of their tanks to explore the laboratory floor.",
           prompt: "Which choice completes the text so that it conforms to the conventions of Standard English?",
-          options: ["to sneak", "sneaking", "sneaks", "snuck"],
+          options: [
+            "to sneak",
+            "sneaking",
+            "sneaks",
+            "snuck"
+          ],
           answer: 1,
-          explanation: "The sentence uses a parallel list of gerunds: 'navigating', 'unscrewing', and therefore needs 'sneaking' to maintain parallel structure."
+          explanation: "The sentence uses a parallel series: 'navigating,' 'unscrewing,' and 'sneaking.'"
         }
       ],
+
       expression: [
         {
           text: "Electric vehicles (EVs) produce zero tailpipe emissions, making them highly attractive for cities battling severe air pollution. ______, the batteries that power these vehicles require lithium mining, an extractive process that can cause significant environmental degradation in rural areas.",
           prompt: "Which choice completes the text with the most logical transition?",
-          options: ["Consequently", "For example", "Nevertheless", "Similarly"],
+          options: [
+            "Consequently",
+            "For example",
+            "Nevertheless",
+            "Similarly"
+          ],
           answer: 2,
-          explanation: "The first sentence highlights a positive environmental aspect of EVs. The second sentence highlights a negative environmental aspect. 'Nevertheless' signals this contrast effectively."
+          explanation: "'Nevertheless' is the best transition because the second sentence introduces a limitation that contrasts with the benefit described in the first sentence."
         }
       ]
+
     };
 
-    // App State
+
+    /* =========================================================
+       APP STATE
+    ========================================================= */
+
     let currentCategory = '';
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
 
-    // DOM Elements
+
+    /* =========================================================
+       DOM
+    ========================================================= */
+
     const views = {
       home: document.getElementById('home-view'),
       quiz: document.getElementById('quiz-view'),
       result: document.getElementById('result-view')
     };
-    
+
+
+    /* =========================================================
+       VIEW MANAGEMENT
+    ========================================================= */
+
     function showView(viewName) {
-      Object.values(views).forEach(v => v.classList.add('hidden'));
+
+      Object.values(views).forEach(view => {
+        view.classList.add('hidden');
+        view.classList.remove('view-enter');
+      });
+
       views[viewName].classList.remove('hidden');
+
+      void views[viewName].offsetWidth;
+
+      views[viewName].classList.add('view-enter');
+
+      lucide.createIcons();
     }
+
 
     function goHome() {
+
       showView('home');
-      document.getElementById('score-badge').classList.add('hidden');
+
+      document
+        .getElementById('score-badge')
+        .classList.add('hidden');
     }
 
+
+    /* =========================================================
+       START QUIZ
+    ========================================================= */
+
     function startQuiz(category) {
+
       currentCategory = category;
+
       currentQuestions = questionBank[category];
+
       currentIndex = 0;
       score = 0;
-      
-      document.getElementById('current-score').innerText = score;
-      document.getElementById('score-badge').classList.remove('hidden');
-      
+
+      document
+        .getElementById('current-score')
+        .innerText = score;
+
+      document
+        .getElementById('score-badge')
+        .classList.remove('hidden');
+
       showView('quiz');
+
       renderQuestion();
     }
 
-    function renderQuestion() {
-      const q = currentQuestions[currentIndex];
-      
-      // Update UI texts
-      document.getElementById('q-category').innerText = currentCategory.replace(/([A-Z])/g, ' $1').trim();
-      document.getElementById('q-text').innerText = q.text;
-      document.getElementById('q-prompt').innerText = q.prompt;
-      
-      // Reset explanation & button
-      document.getElementById('explanation-box').classList.add('hidden');
-      document.getElementById('next-btn').classList.add('hidden');
-      
-      // Update Progress
-      const progress = ((currentIndex) / currentQuestions.length) * 100;
-      document.getElementById('progress-bar').style.width = `${progress}%`;
 
-      // Render Options
-      const optionsContainer = document.getElementById('options-container');
+    /* =========================================================
+       RENDER QUESTION
+    ========================================================= */
+
+    function renderQuestion() {
+
+      const q = currentQuestions[currentIndex];
+
+      document.getElementById('q-category').innerText =
+        currentCategory
+          .replace(/([A-Z])/g, ' $1')
+          .trim();
+
+      document.getElementById('q-text').innerText =
+        q.text;
+
+      document.getElementById('q-prompt').innerText =
+        q.prompt;
+
+      document.getElementById('question-counter').innerText =
+        `Question ${currentIndex + 1} of ${currentQuestions.length}`;
+
+      document
+        .getElementById('explanation-box')
+        .classList.add('hidden');
+
+      document
+        .getElementById('next-btn')
+        .classList.add('hidden');
+
+      const progress =
+        ((currentIndex + 1) / currentQuestions.length) * 100;
+
+      document
+        .getElementById('progress-bar')
+        .style.width = `${progress}%`;
+
+      const optionsContainer =
+        document.getElementById('options-container');
+
       optionsContainer.innerHTML = '';
-      
+
       q.options.forEach((opt, index) => {
+
         const btn = document.createElement('button');
-        btn.className = 'glass-button w-full p-4 rounded-xl text-left text-sm font-medium relative overflow-hidden group';
+
+        btn.className =
+          'answer-button w-full px-4 py-3 rounded-2xl text-left text-sm font-medium flex items-center group answer-enter';
+
+        btn.style.animationDelay =
+          `${index * 50}ms`;
+
         btn.innerHTML = `
-          <span class="inline-block bg-white/10 text-white/50 rounded mr-3 px-2 py-1 text-xs group-hover:bg-white/20 transition">${String.fromCharCode(65 + index)}</span>
-          ${opt}
+          <span class="answer-letter w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold mr-3 shrink-0">
+            ${String.fromCharCode(65 + index)}
+          </span>
+
+          <span class="flex-1">
+            ${opt}
+          </span>
         `;
-        btn.onclick = () => selectAnswer(index, btn);
+
+        btn.onclick = () =>
+          selectAnswer(index, btn);
+
         optionsContainer.appendChild(btn);
       });
+
+      lucide.createIcons();
     }
+
+
+    /* =========================================================
+       SELECT ANSWER
+    ========================================================= */
 
     function selectAnswer(selectedIndex, btnElement) {
-      const q = currentQuestions[currentIndex];
-      const buttons = document.getElementById('options-container').children;
-      
-      // Disable all buttons
-      for (let btn of buttons) {
-        btn.onclick = null; 
-        btn.style.opacity = '0.7';
-      }
-      
-      const isCorrect = (selectedIndex === q.answer);
-      
-      if (isCorrect) {
-        btnElement.classList.add('correct');
-        score++;
-        document.getElementById('current-score').innerText = score;
-        document.getElementById('exp-title').innerText = "Correct! 🎯";
-        document.getElementById('exp-title').classList.replace('text-red-400', 'text-green-400') || document.getElementById('exp-title').classList.add('text-green-400');
-      } else {
-        btnElement.classList.add('incorrect');
-        // Highlight correct one
-        buttons[q.answer].classList.add('correct');
-        document.getElementById('exp-title').innerText = "Not Quite ❌";
-        document.getElementById('exp-title').classList.replace('text-green-400', 'text-red-400') || document.getElementById('exp-title').classList.add('text-red-400');
+
+      const q =
+        currentQuestions[currentIndex];
+
+      const buttons =
+        document.getElementById('options-container').children;
+
+      for (const btn of buttons) {
+        btn.onclick = null;
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.75';
       }
 
-      // Show explanation
-      const expBox = document.getElementById('explanation-box');
-      document.getElementById('exp-text').innerText = q.explanation;
-      expBox.classList.remove('hidden');
-      
-      // Show Next button
-      document.getElementById('next-btn').classList.remove('hidden');
+      const isCorrect =
+        selectedIndex === q.answer;
+
+      if (isCorrect) {
+
+        btnElement.classList.add('correct');
+
+        score++;
+
+        document.getElementById('current-score').innerText =
+          score;
+
+        document.getElementById('exp-title').innerText =
+          'Correct!';
+
+        document.getElementById('exp-title').style.color =
+          '#38B2AC';
+
+      } else {
+
+        btnElement.classList.add('incorrect');
+
+        buttons[q.answer].classList.add('correct');
+
+        document.getElementById('exp-title').innerText =
+          'Not quite';
+
+        document.getElementById('exp-title').style.color =
+          '#A94A4A';
+      }
+
+      document.getElementById('exp-text').innerText =
+        q.explanation;
+
+      document
+        .getElementById('explanation-box')
+        .classList.remove('hidden');
+
+      document
+        .getElementById('next-btn')
+        .classList.remove('hidden');
+
+      lucide.createIcons();
     }
 
+
+    /* =========================================================
+       NEXT QUESTION
+    ========================================================= */
+
     function nextQuestion() {
+
       currentIndex++;
+
       if (currentIndex < currentQuestions.length) {
+
         renderQuestion();
+
       } else {
+
         showResults();
       }
     }
 
+
+    /* =========================================================
+       RESULTS
+    ========================================================= */
+
     function showResults() {
-      document.getElementById('progress-bar').style.width = `100%`;
+
+      document.getElementById('progress-bar')
+        .style.width = '100%';
+
       setTimeout(() => {
+
         showView('result');
-        document.getElementById('final-score').innerText = score;
-        document.getElementById('total-q').innerText = currentQuestions.length;
-        document.getElementById('score-badge').classList.add('hidden');
-      }, 300);
+
+        document.getElementById('final-score')
+          .innerText = score;
+
+        document.getElementById('total-q')
+          .innerText = currentQuestions.length;
+
+        document.getElementById('score-badge')
+          .classList.add('hidden');
+
+        lucide.createIcons();
+
+      }, 250);
     }
+
   </script>
+
 </body>
 </html>
