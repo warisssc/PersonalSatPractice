@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAT Systems | Prep Database</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts: Montserrat for bold hero text, Inter for UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif'],
+          },
+          colors: {
+            brand: '#DE3B34', // The specific red from the reference image
+            brandDark: '#B92B25',
+            surface: {
+              light: '#F8F9FA',
+              dark: '#121212',
+            },
+            text: {
+              main: '#1A1A1A',
+              dark: '#FFFFFF',
+              muted: '#6B7280',
+              mutedDark: '#9CA3AF'
+            },
+            correct: '#10B981',
+            incorrect: '#DE3B34'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Base theme & smooth transitions */
+    :root { color-scheme: light; }
+    html.dark { color-scheme: dark; }
+    
+    body {
+      transition: background-color 0.4s ease, color 0.4s ease;
+      background-color: theme('colors.surface.light');
+      color: theme('colors.text.main');
+    }
+    
+    html.dark body {
+      background-color: theme('colors.surface.dark');
+      color: theme('colors.text.dark');
+    }
+
+    /* Background Geometric Rings mimicking the reference image */
+    .bg-rings {
+      position: absolute;
+      top: -10%;
+      right: -5%;
+      width: 600px;
+      height: 600px;
+      background-image: radial-gradient(circle, transparent 40%, rgba(222, 59, 52, 0.05) 41%, rgba(222, 59, 52, 0.05) 45%, transparent 46%, transparent 55%, rgba(222, 59, 52, 0.05) 56%, rgba(222, 59, 52, 0.05) 60%, transparent 61%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    html.dark .bg-rings {
+      background-image: radial-gradient(circle, transparent 40%, rgba(222, 59, 52, 0.1) 41%, rgba(222, 59, 52, 0.1) 45%, transparent 46%, transparent 55%, rgba(222, 59, 52, 0.1) 56%, rgba(222, 59, 52, 0.1) 60%, transparent 61%);
+    }
+
+    .btn-solid {
+      background-color: theme('colors.brand');
+      color: white;
+      transition: all 0.2s;
+    }
+    .btn-solid:hover { background-color: theme('colors.brandDark'); }
+    
+    .btn-outline {
+      border: 2px solid theme('colors.text.main');
+      color: theme('colors.text.main');
+      transition: all 0.2s;
+    }
+    html.dark .btn-outline {
+      border-color: theme('colors.text.dark');
+      color: theme('colors.text.dark');
+    }
+    .btn-outline:hover {
+      background-color: theme('colors.text.main');
+      color: theme('colors.surface.light');
+    }
+    html.dark .btn-outline:hover {
+      background-color: theme('colors.text.dark');
+      color: theme('colors.surface.dark');
+    }
+
+    /* Hide scrollbars */
+    ::-webkit-scrollbar { display: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+
+  <!-- Geometric Accent -->
+  <div class="bg-rings"></div>
+
+  <!-- ==========================================
+       TOP NAVIGATION & STATS DASHBOARD
+  =========================================== -->
+  <header class="w-full border-b border-black/10 dark:border-white/10 z-10 relative bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Logo matching reference -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
+        <div class="relative w-8 h-8 flex items-center justify-center">
+          <!-- Abstract red circles logo -->
+          <div class="absolute w-8 h-8 rounded-full border-4 border-brand opacity-40 -ml-2"></div>
+          <div class="absolute w-6 h-6 rounded-full bg-brand"></div>
+        </div>
+        <span class="font-display font-black text-xl tracking-tight text-text-main dark:text-text-dark">SAT <span class="text-brand">Systems</span></span>
+      </div>
+
+      <!-- Stats Navigation Menu -->
+      <nav class="flex flex-wrap items-center justify-center gap-6 text-sm font-semibold">
+        <div class="flex items-center gap-2">
+          <span class="text-text-muted dark:text-text-mutedDark">Acc:</span>
+          <span id="nav-acc" class="text-brand font-black text-lg">0%</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-text-muted dark:text-text-mutedDark">Right:</span>
+          <span id="nav-right" class="text-correct font-black text-lg">0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-text-muted dark:text-text-mutedDark">Wrong:</span>
+          <span id="nav-wrong" class="text-incorrect font-black text-lg">0</span>
+        </div>
+        
+        <div class="h-6 w-px bg-black/20 dark:bg-white/20 hidden md:block"></div>
+        
+        <button onclick="resetStats()" class="text-text-muted hover:text-brand transition-colors text-xs uppercase tracking-wider">Reset</button>
+        
+        <button id="theme-toggle" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+          <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN CONTENT
+  =========================================== -->
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-12 z-10 relative">
+    
+    <!-- VIEW: HOME (Two-Tone Hero Layout) -->
+    <div id="view-home" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      
+      <!-- Left Hero Typography -->
+      <div>
+        <h1 class="font-display font-black text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tighter uppercase mb-6 text-text-main dark:text-text-dark">
+          Let's Turn<br>
+          <span class="text-brand">Testing</span> Weaknesses<br>
+          Into <span class="text-brand">Mastery</span>
+        </h1>
+        <p class="text-text-muted dark:text-text-mutedDark text-lg max-w-md mb-8 leading-relaxed">
+          We focus on creating practical digital solutions for real-world test anxiety. Access our scalable 4,000+ question database to simplify your study process.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <button onclick="document.getElementById('module-grid').scrollIntoView({behavior: 'smooth'})" class="btn-solid px-8 py-3 rounded-lg font-bold">
+            Get Started
+          </button>
+          <button class="btn-outline px-8 py-3 rounded-lg font-bold">
+            Learn More
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Module Selection Grid -->
+      <div id="module-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Categories injected via JS -->
+      </div>
+      
+    </div>
+
+    <!-- VIEW: QUIZ -->
+    <div id="view-quiz" class="hidden max-w-3xl mx-auto">
+      
+      <div class="flex justify-between items-center mb-10 pb-4 border-b border-black/10 dark:border-white/10">
+        <button onclick="navigate('home')" class="font-semibold text-text-muted dark:text-text-mutedDark hover:text-brand transition-colors flex items-center gap-2">
+          <i data-lucide="arrow-left" class="w-5 h-5"></i> Back to Home
+        </button>
+        <div class="bg-brand text-white px-4 py-1 rounded-full font-bold text-sm tracking-widest shadow-md shadow-brand/20">
+          <span id="q-counter">Q: 0 / 0</span>
+        </div>
+      </div>
+
+      <div>
+        <span id="q-module" class="text-sm font-bold text-brand uppercase tracking-widest mb-3 block">Module Name</span>
+        <p id="q-text" class="text-lg leading-relaxed mb-8 text-text-muted dark:text-text-mutedDark"></p>
+        <p id="q-prompt" class="font-display font-black text-2xl mb-10"></p>
+        
+        <div id="q-options" class="flex flex-col gap-4">
+          <!-- Options injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: RESULTS / REVIEW -->
+    <div id="view-results" class="hidden max-w-4xl mx-auto">
+      <div class="mb-12 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
+        <div>
+          <h2 class="font-display font-black text-4xl tracking-tighter uppercase mb-2">Practice Complete</h2>
+          <p class="text-text-muted dark:text-text-mutedDark">Tap any question below to review your answers.</p>
+        </div>
+        <button onclick="navigate('home')" class="btn-solid px-8 py-3 rounded-lg font-bold shadow-md shadow-brand/20">
+          Return to Modules
+        </button>
+      </div>
+
+      <div id="review-list" class="flex flex-col gap-4">
+        <!-- Review items injected by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* =========================================================
+       THEME MANAGEMENT
+    ========================================================= */
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    /* =========================================================
+       4K DATABASE ARCHITECTURE SIMULATION
+    ========================================================= */
+    const DataStore = {
+      categories: [
+        { id: 'craft', label: 'Craft & Structure', desc: 'Words in context, text purpose.' },
+        { id: 'info', label: 'Information & Ideas', desc: 'Central ideas, command of evidence.' },
+        { id: 'english', label: 'Standard English', desc: 'Grammar, punctuation, verbs.' },
+        { id: 'expr', label: 'Expression of Ideas', desc: 'Transitions, rhetorical synthesis.' }
+      ],
+      
+      samples: {
+        craft: [{
+          text: "While investigating the effects of extreme pressure on carbon structures, the research team discovered that the newly synthesized material was remarkably ______; it resisted scratching by diamonds, the hardest known natural substance.",
+          prompt: "Which choice completes the text with the most logical and precise word or phrase?",
+          options: ["brittle", "resilient", "porous", "malleable"],
+          answer: 1,
+          explanation: "The material resists scratching by diamonds, indicating durability. 'Resilient' fits the context perfectly."
+        }]
+        // Real datasets would be loaded here. Kept minimal for file size constraints.
+      },
+
+      async fetchQuestions(categoryId, count = 3) {
+        // Simulating pulling from a massive 4,000+ question JSON database
+        let qs = this.samples[categoryId] ? [...this.samples[categoryId]] : [];
+        for(let i = qs.length; i < count; i++) {
+          qs.push({
+            text: `[Database Generated Q${i + 1}] This represents a scalable question pulled dynamically from the 4K+ dataset for the ${categoryId} module.`,
+            prompt: "What is the correct logical conclusion based on the text?",
+            options: ["Incorrect Option A", "Correct Option B", "Incorrect Option C", "Incorrect Option D"],
+            answer: 1,
+            explanation: `Explanation for Q${i+1}: Option B is strictly correct based on the rules of ${categoryId}.`
+          });
+        }
+        return qs;
+      }
+    };
+
+    /* =========================================================
+       APP STATE & GLOBAL STATS
+    ========================================================= */
+    const State = {
+      global: { right: 0, wrong: 0, total: 0 },
+      session: { questions: [], answers: [], currentIdx: 0, categoryLabel: '' }
+    };
+
+    function initStats() {
+      const saved = localStorage.getItem('sat_systems_stats');
+      if (saved) State.global = JSON.parse(saved);
+      updateStatsUI();
+    }
+
+    function saveStats() {
+      localStorage.setItem('sat_systems_stats', JSON.stringify(State.global));
+      updateStatsUI();
+    }
+
+    function updateStatsUI() {
+      const { right, wrong, total } = State.global;
+      document.getElementById('nav-right').innerText = right;
+      document.getElementById('nav-wrong').innerText = wrong;
+      
+      const percent = total === 0 ? 0 : Math.round((right / total) * 100);
+      document.getElementById('nav-acc').innerText = `${percent}%`;
+    }
+
+    function resetStats() {
+      if(confirm("Are you sure you want to wipe your global statistics?")) {
+        State.global = { right: 0, wrong: 0, total: 0 };
+        saveStats();
+      }
+    }
+
+    /* =========================================================
+       UI ROUTING & RENDERING
+    ========================================================= */
+    function navigate(viewId) {
+      ['home', 'quiz', 'results'].forEach(id => {
+        document.getElementById(`view-${id}`).classList.add('hidden');
+      });
+      document.getElementById(`view-${viewId}`).classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    // Render Home Category Cards
+    const moduleGrid = document.getElementById('module-grid');
+    DataStore.categories.forEach(cat => {
+      const card = document.createElement('div');
+      card.className = "bg-white dark:bg-black/50 border-2 border-transparent hover:border-brand transition-all p-6 rounded-xl shadow-sm cursor-pointer group";
+      card.innerHTML = `
+        <div class="w-12 h-12 rounded-lg bg-brand/10 text-brand flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-display font-black text-xl mb-2">${cat.label}</h3>
+        <p class="text-sm text-text-muted dark:text-text-mutedDark">${cat.desc}</p>
+      `;
+      card.onclick = () => startSession(cat.id, cat.label);
+      moduleGrid.appendChild(card);
+    });
+
+    async function startSession(categoryId, label) {
+      State.session.categoryLabel = label;
+      State.session.questions = await DataStore.fetchQuestions(categoryId, 4);
+      State.session.answers = [];
+      State.session.currentIdx = 0;
+      
+      renderQuestion();
+      navigate('quiz');
+    }
+
+    function renderQuestion() {
+      const q = State.session.questions[State.session.currentIdx];
+      
+      document.getElementById('q-counter').innerText = `${State.session.currentIdx + 1} / ${State.session.questions.length}`;
+      document.getElementById('q-module').innerText = State.session.categoryLabel;
+      document.getElementById('q-text').innerText = q.text;
+      document.getElementById('q-prompt').innerText = q.prompt;
+
+      const optsContainer = document.getElementById('q-options');
+      optsContainer.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-6 bg-white dark:bg-[#1C1C1C] border border-black/5 dark:border-white/5 shadow-sm rounded-xl hover:border-brand dark:hover:border-brand transition-all flex gap-4 items-center group";
+        btn.innerHTML = `
+          <div class="w-10 h-10 rounded-full border-2 border-black/20 dark:border-white/20 group-hover:border-brand flex items-center justify-center flex-shrink-0 font-bold transition-colors">
+            ${String.fromCharCode(65 + idx)}
+          </div>
+          <span class="text-lg font-medium">${opt}</span>
+        `;
+        btn.onclick = () => handleAnswer(idx);
+        optsContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIdx) {
+      const q = State.session.questions[State.session.currentIdx];
+      const isCorrect = selectedIdx === q.answer;
+
+      State.global.total += 1;
+      if (isCorrect) State.global.right += 1;
+      else State.global.wrong += 1;
+      saveStats();
+
+      State.session.answers.push({
+        question: q,
+        selected: selectedIdx,
+        isCorrect: isCorrect
+      });
+
+      State.session.currentIdx++;
+      if (State.session.currentIdx < State.session.questions.length) {
+        renderQuestion();
+      } else {
+        renderReview();
+      }
+    }
+
+    function renderReview() {
+      const container = document.getElementById('review-list');
+      container.innerHTML = '';
+
+      State.session.answers.forEach((ans, idx) => {
+        const item = document.createElement('div');
+        item.className = "bg-white dark:bg-[#1C1C1C] border border-black/5 dark:border-white/5 rounded-xl overflow-hidden shadow-sm";
+        
+        const badgeColor = ans.isCorrect ? 'bg-correct' : 'bg-incorrect';
+        const label = ans.isCorrect ? 'Correct' : 'Incorrect';
+        
+        item.innerHTML = `
+          <button class="w-full text-left p-6 flex justify-between items-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden')">
+            <div class="flex items-center gap-4">
+              <span class="${badgeColor} text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">${label}</span>
+              <span class="font-bold truncate max-w-xs md:max-w-xl">${ans.question.prompt}</span>
+            </div>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted"></i>
+          </button>
+          
+          <div class="hidden p-6 pt-0 border-t border-black/5 dark:border-white/5 mt-2">
+            <p class="text-text-muted dark:text-text-mutedDark py-4">${ans.question.text}</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+              <div class="p-4 rounded-lg bg-black/5 dark:bg-white/5 border ${ans.isCorrect ? 'border-transparent' : 'border-incorrect/50 text-incorrect'}">
+                <span class="block text-[10px] font-bold uppercase mb-2 opacity-50">Your Answer</span>
+                ${ans.question.options[ans.selected]}
+              </div>
+              <div class="p-4 rounded-lg bg-correct/10 text-correct border border-correct/30">
+                <span class="block text-[10px] font-bold uppercase mb-2 opacity-70">Correct Answer</span>
+                ${ans.question.options[ans.question.answer]}
+              </div>
+            </div>
+            
+            <div class="mt-4 p-5 bg-brand/5 border-l-4 border-brand rounded-r-lg text-sm text-text-main dark:text-text-dark">
+              <span class="block font-bold uppercase tracking-widest text-brand text-xs mb-2">System Analysis</span>
+              ${ans.question.explanation}
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      navigate('results');
+    }
+
+    // Init
+    initStats();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
