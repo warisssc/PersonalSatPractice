@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <!-- Strictly lock the viewport to prevent the zooming/horizontal scroll seen in the screenshot -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SAT Systems | Prep Database</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif'],
+          },
+          colors: {
+            brand: '#DE3B34',
+            brandDark: '#A82520',
+            surface: { light: '#F8F9FA', dark: '#121212' },
+            text: { main: '#1A1A1A', dark: '#FFFFFF', muted: '#6B7280', mutedDark: '#9CA3AF' },
+            correct: '#10B981',
+            incorrect: '#DE3B34'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* =========================================================
+       BASE LAYOUT & STRICT LOCKS
+    ========================================================= */
+    :root { color-scheme: light; }
+    html.dark { color-scheme: dark; }
+    
+    html, body {
+      width: 100vw;
+      overflow-x: hidden; /* Strict horizontal lock */
+      margin: 0;
+      padding: 0;
+      background-color: theme('colors.surface.light');
+      color: theme('colors.text.main');
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    
+    html.dark body {
+      background-color: theme('colors.surface.dark');
+      color: theme('colors.text.dark');
+    }
+
+    /* Background Rings - locked inside a container so they don't break width */
+    .bg-rings {
+      position: absolute;
+      top: -10%;
+      right: -20%;
+      width: 150vw;
+      max-width: 600px;
+      aspect-ratio: 1/1;
+      background-image: radial-gradient(circle, transparent 40%, rgba(222, 59, 52, 0.05) 41%, rgba(222, 59, 52, 0.05) 45%, transparent 46%, transparent 55%, rgba(222, 59, 52, 0.05) 56%, rgba(222, 59, 52, 0.05) 60%, transparent 61%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    html.dark .bg-rings {
+      background-image: radial-gradient(circle, transparent 40%, rgba(222, 59, 52, 0.12) 41%, rgba(222, 59, 52, 0.12) 45%, transparent 46%, transparent 55%, rgba(222, 59, 52, 0.12) 56%, rgba(222, 59, 52, 0.12) 60%, transparent 61%);
+    }
+
+    /* =========================================================
+       HIGH-END PRESENTATION ANIMATIONS
+    ========================================================= */
+    
+    /* Splash Screen Spin */
+    @keyframes spin-reveal {
+      0% { transform: scale(0.3) rotate(-180deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .anim-spin-reveal {
+      animation: spin-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Presentation Slide Transitions */
+    .view-container {
+      display: none;
+      width: 100%;
+    }
+    .view-container.active {
+      display: block;
+    }
+    
+    @keyframes slide-in-right {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .slide-in {
+      animation: slide-in-right 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    /* =========================================================
+       SNAPPY DUOLINGO PHYSICS
+    ========================================================= */
+    .tile-bouncy {
+      transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 0 0 var(--shadow-color, rgba(0,0,0,0.15));
+      cursor: pointer;
+    }
+    html.dark .tile-bouncy { --shadow-color: rgba(255,255,255,0.15); }
+    
+    .tile-bouncy:active {
+      transform: translateY(4px) scale(0.98); /* Added scale compress for extra punch */
+      box-shadow: 0 0px 0 0 var(--shadow-color, rgba(0,0,0,0.15));
+    }
+    
+    .shadow-brand-3d { --shadow-color: theme('colors.brandDark') !important; }
+    .shadow-correct-3d { --shadow-color: #047857 !important; }
+    .shadow-incorrect-3d { --shadow-color: #991B1B !important; }
+    .shadow-light-3d { --shadow-color: rgba(0,0,0,0.05) !important; }
+    html.dark .shadow-light-3d { --shadow-color: rgba(255,255,255,0.05) !important; }
+
+    .btn-solid { background-color: theme('colors.brand'); color: white; }
+
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative font-sans">
+
+  <!-- ==========================================
+       SPLASH SCREEN (SPIN REVEAL)
+  =========================================== -->
+  <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-light dark:bg-surface-dark transition-opacity duration-500 ease-in-out">
+    <div class="anim-spin-reveal flex flex-col items-center">
+      <div class="relative w-20 h-20 flex items-center justify-center mb-6">
+        <div class="absolute w-20 h-20 rounded-full border-[6px] border-brand opacity-40 -ml-4"></div>
+        <div class="absolute w-14 h-14 rounded-full bg-brand shadow-xl shadow-brand/30"></div>
+      </div>
+      <h1 class="font-display font-black text-4xl tracking-tight">SAT <span class="text-brand">Systems</span></h1>
+    </div>
+  </div>
+
+  <div class="bg-rings"></div>
+
+  <!-- ==========================================
+       TOP NAVIGATION
+  =========================================== -->
+  <header id="main-header" class="w-full border-b border-black/10 dark:border-white/10 z-10 relative bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md opacity-0 transition-opacity duration-700">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+      
+      <!-- Nav Header (Mobile locked) -->
+      <div class="flex items-center justify-between w-full md:w-auto">
+        <div class="flex items-center gap-2 cursor-pointer tile-bouncy shadow-light-3d rounded-xl p-2" onclick="navigate('home')">
+          <div class="relative w-6 h-6 flex items-center justify-center">
+            <div class="absolute w-6 h-6 rounded-full border-2 border-brand opacity-40 -ml-1"></div>
+            <div class="absolute w-4 h-4 rounded-full bg-brand"></div>
+          </div>
+          <span class="font-display font-black text-lg tracking-tight">SAT<span class="text-brand"> Sys</span></span>
+        </div>
+
+        <button id="theme-toggle" class="md:hidden p-2 rounded-xl border-2 border-black/5 dark:border-white/5 tile-bouncy shadow-light-3d text-text-muted">
+          <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+        </button>
+      </div>
+
+      <!-- Stats Array -->
+      <nav class="flex w-full md:w-auto items-center justify-between md:justify-center gap-2 md:gap-6 text-xs font-semibold bg-black/5 dark:bg-white/5 md:bg-transparent rounded-xl p-2 md:p-0">
+        <div class="flex-1 text-center md:flex-none">
+          <span class="text-text-muted uppercase text-[10px] block md:inline md:mr-1">Acc</span>
+          <span id="nav-acc" class="text-brand font-black text-base md:text-lg">0%</span>
+        </div>
+        <div class="h-6 w-px bg-black/10 dark:bg-white/10"></div>
+        <div class="flex-1 text-center md:flex-none">
+          <span class="text-text-muted uppercase text-[10px] block md:inline md:mr-1">Right</span>
+          <span id="nav-right" class="text-correct font-black text-base md:text-lg">0</span>
+        </div>
+        <div class="h-6 w-px bg-black/10 dark:bg-white/10"></div>
+        <div class="flex-1 text-center md:flex-none">
+          <span class="text-text-muted uppercase text-[10px] block md:inline md:mr-1">Wrong</span>
+          <span id="nav-wrong" class="text-incorrect font-black text-base md:text-lg">0</span>
+        </div>
+        
+        <div class="h-6 w-px bg-black/20 dark:bg-white/20 hidden md:block mx-2"></div>
+        
+        <button onclick="resetStats()" class="hidden md:block text-text-muted hover:text-brand transition-colors text-xs uppercase tracking-wider tile-bouncy shadow-light-3d px-3 py-1.5 rounded-lg border border-black/10 dark:border-white/10">Reset</button>
+        
+        <button id="theme-toggle-desktop" class="hidden md:block p-2 rounded-xl border border-black/10 dark:border-white/10 tile-bouncy shadow-light-3d text-text-muted">
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN CONTENT (Strictly Contained)
+  =========================================== -->
+  <main id="main-content" class="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 z-10 relative opacity-0 transition-opacity duration-700 delay-150 overflow-x-hidden">
+    
+    <!-- VIEW: HOME -->
+    <div id="view-home" class="view-container active">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center pb-12 w-full">
+        
+        <div class="text-left w-full break-words">
+          <!-- Fluid typography and break-words fixes the mobile overflow issue -->
+          <h1 class="font-display font-black text-[10vw] leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl tracking-tighter uppercase mb-4 break-words hyphens-auto">
+            Turn<br class="hidden md:block">
+            <span class="text-brand">Testing</span><br>
+            Weaknesses<br>
+            Into <span class="text-brand">Mastery</span>
+          </h1>
+          <p class="text-text-muted dark:text-text-mutedDark text-sm sm:text-base md:text-lg max-w-md mb-8 leading-relaxed">
+            Access our scalable 4,000+ question database. Click a module below to generate a presentation-style dynamic prep set.
+          </p>
+        </div>
+
+        <div id="module-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+          <!-- Categories injected via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: QUIZ -->
+    <div id="view-quiz" class="view-container max-w-3xl mx-auto pb-12 w-full">
+      
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-black/10 dark:border-white/10">
+        <button onclick="navigate('home')" class="font-bold text-text-muted text-sm hover:text-brand transition-colors flex items-center gap-2 tile-bouncy shadow-light-3d px-3 py-2 rounded-lg border border-black/10 dark:border-white/10">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+        </button>
+        <div class="bg-surface-light dark:bg-surface-dark border-2 border-black/10 dark:border-white/10 px-4 py-2 rounded-xl font-bold text-sm tracking-widest tile-bouncy shadow-light-3d">
+          <span id="q-counter">0 / 0</span>
+        </div>
+      </div>
+
+      <!-- Question Content Container (Animated inside) -->
+      <div id="quiz-anim-wrapper" class="w-full">
+        <span id="q-module" class="text-xs font-black text-brand uppercase tracking-widest mb-3 block">Module</span>
+        <p id="q-text" class="text-sm md:text-base leading-relaxed mb-5 text-text-muted dark:text-text-mutedDark"></p>
+        <p id="q-prompt" class="font-display font-black text-lg sm:text-xl md:text-2xl mb-8 break-words"></p>
+        
+        <div id="q-options" class="flex flex-col gap-3 md:gap-4 w-full">
+          <!-- Options injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: RESULTS -->
+    <div id="view-results" class="view-container max-w-4xl mx-auto pb-12 w-full">
+      <div class="mb-10 text-left flex flex-col justify-between items-start gap-6">
+        <div>
+          <h2 class="font-display font-black text-3xl md:text-4xl tracking-tighter uppercase mb-2">Practice Complete</h2>
+          <p class="text-text-muted dark:text-text-mutedDark text-sm">Review your answers below.</p>
+        </div>
+        <button onclick="navigate('home')" class="btn-solid tile-bouncy shadow-brand-3d px-6 py-3 rounded-xl font-bold w-full md:w-auto">
+          Return to Modules
+        </button>
+      </div>
+
+      <div id="review-list" class="flex flex-col gap-4 w-full">
+        <!-- Review items injected by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* =========================================================
+       INITIALIZATION & SPLASH REVEAL
+    ========================================================= */
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        splash.style.opacity = '0';
+        setTimeout(() => {
+          splash.style.display = 'none';
+          document.getElementById('main-header').classList.remove('opacity-0');
+          document.getElementById('main-content').classList.remove('opacity-0');
+        }, 500);
+      }, 1000); 
+    });
+
+    /* =========================================================
+       THEME MANAGEMENT
+    ========================================================= */
+    const setupThemeToggle = (btnId) => {
+      const btn = document.getElementById(btnId);
+      if(!btn) return;
+      btn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      });
+    };
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+    setupThemeToggle('theme-toggle');
+    setupThemeToggle('theme-toggle-desktop');
+
+    /* =========================================================
+       4K+ DATABASE SIMULATION
+    ========================================================= */
+    const DataStore = {
+      categories: [
+        { id: 'craft', label: 'Craft & Structure', desc: 'Words in context, text purpose.' },
+        { id: 'info', label: 'Information & Ideas', desc: 'Central ideas, evidence.' },
+        { id: 'english', label: 'Standard English', desc: 'Grammar, punctuation.' },
+        { id: 'expr', label: 'Expression of Ideas', desc: 'Transitions, synthesis.' }
+      ],
+      samples: {
+        craft: [{
+          text: "While investigating the effects of extreme pressure on carbon structures, the research team discovered that the newly synthesized material was remarkably ______; it resisted scratching by diamonds, the hardest known natural substance.",
+          prompt: "Which choice completes the text with the most logical and precise word or phrase?",
+          options: ["brittle", "resilient", "porous", "malleable"],
+          answer: 1,
+          explanation: "The material resists scratching by diamonds, indicating durability. 'Resilient' fits perfectly."
+        }]
+      },
+      async fetchQuestions(categoryId, count = 3) {
+        let qs = this.samples[categoryId] ? [...this.samples[categoryId]] : [];
+        for(let i = qs.length; i < count; i++) {
+          qs.push({
+            text: `[Database Q${i + 1}] This represents a scalable question pulled dynamically from the 4K+ dataset for the ${categoryId} module.`,
+            prompt: "What is the correct logical conclusion based on the text?",
+            options: ["Incorrect Option A", "Correct Option B", "Incorrect Option C", "Incorrect Option D"],
+            answer: 1,
+            explanation: `Option B is correct based on the established rules of ${categoryId}.`
+          });
+        }
+        return qs;
+      }
+    };
+
+    /* =========================================================
+       APP STATE
+    ========================================================= */
+    const State = {
+      global: { right: 0, wrong: 0, total: 0 },
+      session: { questions: [], answers: [], currentIdx: 0, categoryLabel: '' }
+    };
+
+    function initStats() {
+      const saved = localStorage.getItem('sat_systems_stats');
+      if (saved) State.global = JSON.parse(saved);
+      updateStatsUI();
+    }
+
+    function saveStats() {
+      localStorage.setItem('sat_systems_stats', JSON.stringify(State.global));
+      updateStatsUI();
+    }
+
+    function updateStatsUI() {
+      const { right, wrong, total } = State.global;
+      document.getElementById('nav-right').innerText = right;
+      document.getElementById('nav-wrong').innerText = wrong;
+      const percent = total === 0 ? 0 : Math.round((right / total) * 100);
+      document.getElementById('nav-acc').innerText = `${percent}%`;
+    }
+
+    function resetStats() {
+      if(confirm("Are you sure you want to wipe your global statistics?")) {
+        State.global = { right: 0, wrong: 0, total: 0 };
+        saveStats();
+      }
+    }
+
+    /* =========================================================
+       UI ROUTING & SLIDE ANIMATIONS
+    ========================================================= */
+    function navigate(viewId) {
+      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active', 'slide-in'));
+      
+      const target = document.getElementById(`view-${viewId}`);
+      target.classList.add('active');
+      
+      // Trigger the slide-in presentation animation
+      void target.offsetWidth; 
+      target.classList.add('slide-in');
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // Render Home Categories
+    const moduleGrid = document.getElementById('module-grid');
+    DataStore.categories.forEach(cat => {
+      const card = document.createElement('div');
+      card.className = "bg-white dark:bg-[#1A1A1A] border-2 border-black/10 dark:border-white/10 p-5 rounded-2xl group tile-bouncy shadow-light-3d w-full";
+      card.innerHTML = `
+        <div class="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center mb-3 border-2 border-brand/20">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-display font-black text-lg mb-1">${cat.label}</h3>
+        <p class="text-xs text-text-muted dark:text-text-mutedDark">${cat.desc}</p>
+      `;
+      card.onclick = () => startSession(cat.id, cat.label);
+      moduleGrid.appendChild(card);
+    });
+
+    async function startSession(categoryId, label) {
+      State.session.categoryLabel = label;
+      State.session.questions = await DataStore.fetchQuestions(categoryId, 4);
+      State.session.answers = [];
+      State.session.currentIdx = 0;
+      
+      renderQuestion();
+      navigate('quiz');
+    }
+
+    function renderQuestion() {
+      const q = State.session.questions[State.session.currentIdx];
+      const wrapper = document.getElementById('quiz-anim-wrapper');
+      
+      // Re-trigger slide animation for each new question (Presentation style)
+      wrapper.classList.remove('slide-in');
+      void wrapper.offsetWidth;
+      wrapper.classList.add('slide-in');
+
+      document.getElementById('q-counter').innerText = `${State.session.currentIdx + 1} / ${State.session.questions.length}`;
+      document.getElementById('q-module').innerText = State.session.categoryLabel;
+      document.getElementById('q-text').innerText = q.text;
+      document.getElementById('q-prompt').innerText = q.prompt;
+
+      const optsContainer = document.getElementById('q-options');
+      optsContainer.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-4 bg-white dark:bg-[#1C1C1C] border-2 border-black/10 dark:border-white/10 rounded-2xl flex gap-3 items-center group tile-bouncy shadow-light-3d";
+        btn.innerHTML = `
+          <div class="w-10 h-10 rounded-xl border-2 border-black/10 dark:border-white/10 flex items-center justify-center flex-shrink-0 font-bold text-text-muted group-hover:bg-black/5 dark:group-hover:bg-white/5 transition-colors">
+            ${String.fromCharCode(65 + idx)}
+          </div>
+          <span class="text-sm sm:text-base font-semibold break-words w-full pr-2">${opt}</span>
+        `;
+        btn.onclick = () => handleAnswer(idx);
+        optsContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIdx) {
+      const q = State.session.questions[State.session.currentIdx];
+      const isCorrect = selectedIdx === q.answer;
+
+      State.global.total += 1;
+      if (isCorrect) State.global.right += 1;
+      else State.global.wrong += 1;
+      saveStats();
+
+      State.session.answers.push({ question: q, selected: selectedIdx, isCorrect: isCorrect });
+      State.session.currentIdx++;
+
+      // Allow 200ms for the physical button compress animation before swiping
+      setTimeout(() => {
+        if (State.session.currentIdx < State.session.questions.length) {
+          renderQuestion();
+        } else {
+          renderReview();
+        }
+      }, 200);
+    }
+
+    function renderReview() {
+      const container = document.getElementById('review-list');
+      container.innerHTML = '';
+
+      State.session.answers.forEach((ans, idx) => {
+        const item = document.createElement('div');
+        const badgeColor = ans.isCorrect ? 'bg-correct' : 'bg-incorrect';
+        const shadowClass = ans.isCorrect ? 'shadow-correct-3d' : 'shadow-incorrect-3d';
+        const borderColor = ans.isCorrect ? 'border-correct/30' : 'border-incorrect/30';
+        const label = ans.isCorrect ? 'Correct' : 'Incorrect';
+        
+        item.className = `bg-white dark:bg-[#1C1C1C] border-2 ${borderColor} rounded-2xl mb-4 tile-bouncy ${shadowClass} w-full`;
+        
+        item.innerHTML = `
+          <button class="w-full text-left p-4 md:p-5 flex justify-between items-center outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
+            <div class="flex items-center gap-3 overflow-hidden pr-2">
+              <span class="${badgeColor} text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg flex-shrink-0">${label}</span>
+              <span class="font-bold truncate text-sm sm:text-base">${ans.question.prompt}</span>
+            </div>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted flex-shrink-0"></i>
+          </button>
+          
+          <div class="hidden p-4 md:p-5 pt-0 border-t border-black/5 dark:border-white/5 mt-2 w-full">
+            <p class="text-text-muted dark:text-text-mutedDark py-3 text-sm">${ans.question.text}</p>
+            
+            <div class="flex flex-col gap-3 my-3 text-sm w-full">
+              <div class="p-4 rounded-xl bg-black/5 dark:bg-white/5 border-2 ${ans.isCorrect ? 'border-transparent' : 'border-incorrect/30 text-incorrect'} break-words">
+                <span class="block text-[10px] font-bold uppercase mb-1 opacity-60">Your Answer</span>
+                <span class="font-semibold">${ans.question.options[ans.selected]}</span>
+              </div>
+              <div class="p-4 rounded-xl bg-correct/10 border-2 border-correct/30 text-correct break-words">
+                <span class="block text-[10px] font-bold uppercase mb-1 opacity-80">Correct Answer</span>
+                <span class="font-semibold">${ans.question.options[ans.question.answer]}</span>
+              </div>
+            </div>
+            
+            <div class="mt-4 p-4 bg-brand/5 border-l-4 border-brand rounded-r-xl text-sm text-text-main dark:text-text-dark w-full">
+              <span class="block font-black uppercase tracking-widest text-brand text-[10px] mb-2">System Analysis</span>
+              ${ans.question.explanation}
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      navigate('results');
+    }
+
+    initStats();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
